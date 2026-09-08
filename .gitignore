@@ -1,0 +1,29 @@
+# Environment and credentials
+.env
+*.env.local
+
+# SQLite Database (generated on first run)
+*.db
+*.sqlite3
+*.db-journal
+*.db-wal
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.pytest_cache/
+
+# Internal Agent & Scratch Files
+.gemini/
+scratch/
+*backup*
+*.pre_*
+Agentic Cinema Screens-cursor-projects/
+
+
+# Operating System files
+.DS_Store
+Thumbs.db
+

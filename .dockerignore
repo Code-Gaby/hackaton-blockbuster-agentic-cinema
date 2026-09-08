@@ -1,0 +1,15 @@
+.env
+*.env.local
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+scratch/
+.gemini/
+*backup*
+*.pre_*
+*.db
+*.sqlite3
