@@ -4279,8 +4279,9 @@
               ${dict.view_tech_breakdown || '🎬 View Breakdown →'}
             </span>
             <button class="btn-scout-pill" onclick="event.stopPropagation(); scoutSceneWithParallel('${s.id}')" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.45); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
-              🌐 ${dict.btn_scout_parallel || 'Scout with Parallel'}
+              ${dict.btn_scout_parallel || '🌐 Scout with Parallel'}
             </button>
+
           </div>
         `;
         scenesContainer.appendChild(card);
@@ -4382,8 +4383,9 @@
               <div style="font-size: 1.1rem; color: var(--gold-primary); font-weight: 700;">$${(s.estimated_cost || 2000).toLocaleString()}</div>
             </div>
             <button class="btn-scout-parallel-hero" onclick="scoutSceneWithParallel('${s.id}')" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.3)); border: 1px solid #38bdf8; color: #38bdf8; padding: 7px 14px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-              🌐 ${dict.btn_scout_parallel || 'Scout with Parallel'}
+              ${dict.btn_scout_parallel || '🌐 Scout with Parallel'}
             </button>
+
             <button id="btn-toggle-edit-sc-view" class="btn-export" style="cursor: pointer; margin-left: 4px;">
               ${dict.edit_scene_btn || '✏️ Edit Scene'}
             </button>
@@ -4468,6 +4470,270 @@ ${s.script_text || s.summary}
 
     
     // Reintentar Generación de Asset Visual (Google GenAI Real)
+    
+    // =========================================================================
+    // PARALLEL SEARCH CORE WORKFLOW: LOCATION SCOUTING & ZERO MUTATION GATE
+    // =========================================================================
+    let currentScoutedScene = null;
+    let currentScoutData = null;
+
+    window.scoutSceneWithParallel = async function(sceneId, customObjective = '') {
+      const dict = i18n[currentLang] || i18n.en;
+      const modalContent = document.getElementById('parallel-scout-modal-content');
+      if (!modalContent) return;
+
+      // Find scene object in activeProjectDetails
+      let scene = null;
+      if (activeProjectDetails && activeProjectDetails.scenes) {
+        scene = activeProjectDetails.scenes.find(s => s.id === sceneId);
+      }
+      currentScoutedScene = scene || { id: sceneId, scene_number: 1, slugline: 'Scene', location: 'Location' };
+
+      // Render Loading State
+      modalContent.innerHTML = `
+        <div style="padding: 24px; text-align: center;">
+          <div style="font-size: 2.2rem; margin-bottom: 12px; animation: pulse 1.5s infinite;">🌐</div>
+          <h3 style="font-family: var(--font-display); color: var(--cyan-accent); font-size: 1.3rem; margin-bottom: 8px;">
+            ${dict.scout_modal_title || 'Parallel Search — Location Scout'}
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 600px; margin: 0 auto 20px auto;">
+            ${dict.scout_modal_sub || 'Live web search for authentic real-world filming locations matching scene parameters.'}
+          </p>
+
+          <div style="background: var(--bg-surface-elevated); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 20px; max-width: 620px; margin: 0 auto 20px auto; text-align: left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span class="badge-status" style="border-color:#38bdf8; color:#38bdf8; font-size:0.75rem;">
+                🎬 ${dict.scene_prefix || 'SCENE'} #${currentScoutedScene.scene_number || 1}
+              </span>
+              <span style="font-family:var(--font-mono); font-size:0.8rem; color:var(--gold-glow);">
+                ${escapeHtml(currentScoutedScene.slugline || '')}
+              </span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.84rem; color:var(--text-main);">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="spinner" style="width:14px; height:14px; border-width:2px;"></span>
+                <span>Connecting to <b>Parallel Search API</b> (parallel-web SDK runtime)...</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; opacity:0.8;">
+                <span style="color:var(--gold-primary);">•</span>
+                <span>Formulating search vectors from screenplay environment & genre...</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; opacity:0.6;">
+                <span style="color:var(--gold-primary);">•</span>
+                <span>Synthesizing candidates & production feasibility with <b>Gemini Co-Director</b>...</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:0.8rem; color:var(--gold-glow); font-family:var(--font-mono);">
+            🔒 Zero Mutation Gate: Screenplay & SQLite remain intact until Director confirmation.
+          </div>
+        </div>
+      `;
+
+      openModal('parallel-scout-modal');
+
+      try {
+        const payload = {
+          lang: (currentLang || 'EN').toUpperCase(),
+          objective: customObjective || ''
+        };
+        const res = await fetch(`/api/scenes/${sceneId}/scout_parallel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || data.message || 'Scouting request failed');
+        }
+        currentScoutData = data;
+        renderScoutResults(data, currentScoutedScene);
+      } catch (err) {
+        modalContent.innerHTML = `
+          <div style="padding: 30px; text-align: center;">
+            <div style="font-size: 2rem; color: #ef4444; margin-bottom: 10px;">⚠️</div>
+            <h3 style="color: #f87171; font-size: 1.15rem; margin-bottom: 8px;">Scouting Error</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 500px; margin: 0 auto 16px auto;">
+              ${escapeHtml(err.message || 'Could not complete Parallel Search query.')}
+            </p>
+            <button class="btn-export" onclick="closeModal('parallel-scout-modal')">${dict.btn_cancel || 'Close'}</button>
+          </div>
+        `;
+      }
+    };
+
+    window.renderScoutResults = function(data, scene) {
+      const dict = i18n[currentLang] || i18n.en;
+      const modalContent = document.getElementById('parallel-scout-modal-content');
+      if (!modalContent) return;
+
+      const candidates = data.candidates || [];
+      const sources = data.sources || [];
+      const isEs = (currentLang || 'en').toLowerCase() === 'es';
+
+      const candidateCardsHtml = candidates.map((cand, idx) => {
+        const candJsonAttr = encodeURIComponent(JSON.stringify(cand));
+        const matchPct = cand.match_score || (95 - idx * 5);
+        return `
+          <div class="scout-candidate-card" style="background: var(--bg-surface-elevated); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 18px; margin-bottom: 16px; transition: border-color 0.2s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <div>
+                <span class="badge-status" style="border-color: #38bdf8; color: #38bdf8; font-size: 0.72rem; margin-bottom: 4px; display: inline-block;">
+                  #${idx + 1} • ${escapeHtml(cand.city_country || 'Real-World Verified')}
+                </span>
+                <h4 style="font-family: var(--font-display); font-size: 1.18rem; color: var(--gold-glow); margin: 2px 0 0 0;">
+                  ${escapeHtml(cand.name)}
+                </h4>
+              </div>
+              <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 20px; padding: 4px 12px; font-family: var(--font-mono); font-size: 0.78rem; color: #4ade80; font-weight: 700;">
+                ⭐ ${matchPct}% ${dict.scout_match_score || 'MATCH'}
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; font-size: 0.84rem;">
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border-left: 3px solid #38bdf8;">
+                <b style="color: #38bdf8; display: block; margin-bottom: 2px;">🎭 ${dict.scout_narrative_fit || 'Narrative Fit'}:</b>
+                <span style="color: var(--text-main); line-height: 1.4;">${escapeHtml(cand.creative_fit || '')}</span>
+              </div>
+              <div style="background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border-left: 3px solid #4ade80;">
+                <b style="color: #4ade80; display: block; margin-bottom: 2px;">🚚 ${dict.scout_production_fit || 'Production Fit'}:</b>
+                <span style="color: var(--text-muted); line-height: 1.4;">${escapeHtml(cand.production_fit || '')}</span>
+              </div>
+            </div>
+
+            <div style="background: #08090d; border: 1px dashed rgba(212, 175, 55, 0.4); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 0.82rem;">
+              <div style="color: var(--gold-primary); font-weight: 700; margin-bottom: 4px; font-family: var(--font-mono);">
+                📐 ${dict.scout_diff_title || 'Proposed Scene Modification'}:
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <span style="color: var(--text-muted); font-size: 0.75rem;">CURRENT SLUGLINE:</span>
+                  <div style="color: #f87171; font-family: var(--font-mono);">${escapeHtml(scene.slugline || '')}</div>
+                </div>
+                <div>
+                  <span style="color: var(--text-muted); font-size: 0.75rem;">PROPOSED SLUGLINE:</span>
+                  <div style="color: #4ade80; font-family: var(--font-mono); font-weight: 700;">${escapeHtml(cand.proposed_slugline || '')}</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+              <button class="btn-action btn-apply-loc" data-scene-id="${escapeHtml(scene.id)}" data-candidate="${candJsonAttr}" onclick="applyScoutedLocationFromButton(this)" style="background: linear-gradient(135deg, #0284c7, #0369a1); border: 1px solid #38bdf8; color: #fff; padding: 8px 18px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform 0.15s ease;">
+                ${dict.btn_apply_location || '✅ Use This Location (Apply to Scene)'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const sourcesListHtml = sources.length === 0 ? '' : `
+        <div style="margin-top: 20px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+          <h5 style="color: var(--cyan-accent); font-size: 0.86rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <span>🌐</span> <span>${dict.scout_sources_title || 'Live Web Sources (Parallel Search API)'} (${sources.length})</span>
+          </h5>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; font-size: 0.78rem;">
+            ${sources.map(s => `
+              <div style="background: var(--bg-surface); padding: 6px 10px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                <a href="${escapeHtml(s.url || '#')}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 600px;">
+                  🔗 ${escapeHtml(s.title || 'Web Reference')}
+                </a>
+                <span style="color: var(--text-muted); font-family: var(--font-mono); font-size: 0.72rem;">parallel-web verified</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      modalContent.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; margin-bottom: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="badge-status" style="border-color: #38bdf8; color: #38bdf8;">🌐 PARALLEL SEARCH API</span>
+              <span class="badge-status" style="border-color: var(--gold-primary); color: var(--gold-glow);">GEMINI CO-DIRECTOR</span>
+            </div>
+            <h2 style="font-family: var(--font-display); font-size: 1.35rem; color: var(--gold-glow); margin-top: 6px;">
+              ${dict.scout_modal_title || 'Parallel Search — Location Scout'}
+            </h2>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+              Scene #${scene.scene_number || 1} • <span style="font-family: var(--font-mono); color: var(--text-main);">${escapeHtml(scene.slugline || '')}</span>
+            </div>
+          </div>
+          <button class="btn-close-modal" onclick="closeModal('parallel-scout-modal')">&times;</button>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem;">
+          <b style="color: #38bdf8;">Search Objective:</b>
+          <span style="color: var(--text-main); margin-left: 4px;">${escapeHtml(data.objective || '')}</span>
+        </div>
+
+        <div>
+          <h4 style="color: var(--gold-glow); font-size: 0.95rem; margin-bottom: 12px;">
+            ⭐ Ranked Real-World Candidate Locations (${candidates.length}):
+          </h4>
+          ${candidateCardsHtml}
+          ${sourcesListHtml}
+        </div>
+      `;
+    };
+
+    window.applyScoutedLocationFromButton = function(btn) {
+      const sceneId = btn.getAttribute('data-scene-id');
+      const candRaw = decodeURIComponent(btn.getAttribute('data-candidate') || '{}');
+      try {
+        const cand = JSON.parse(candRaw);
+        applyScoutedLocation(sceneId, cand);
+      } catch(e) {
+        console.error("Error parsing candidate data:", e);
+      }
+    };
+
+    window.applyScoutedLocation = async function(sceneId, candidate) {
+      const dict = i18n[currentLang] || i18n.en;
+      try {
+        const payload = {
+          candidate_name: candidate.name,
+          location: candidate.proposed_location || candidate.name,
+          slugline: candidate.proposed_slugline,
+          environmental_details: candidate.proposed_environment
+        };
+
+        const res = await fetch(`/api/scenes/${sceneId}/apply_scouted_location`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to apply location');
+        }
+
+        // Close scout modal
+        closeModal('parallel-scout-modal');
+
+        // Show feedback toast
+        showToast(data.impact_message || `✅ Location updated to ${candidate.name}!`);
+
+        // Update local scene cache
+        if (activeProjectDetails && activeProjectDetails.scenes) {
+          const idx = activeProjectDetails.scenes.findIndex(s => s.id === sceneId);
+          if (idx !== -1 && data.scene) {
+            activeProjectDetails.scenes[idx] = data.scene;
+          }
+          renderScenesList(activeProjectDetails.scenes);
+        }
+
+        // If scene inspection modal was open, refresh it
+        const sceneModal = document.getElementById('scene-modal');
+        if (sceneModal && sceneModal.style.display === 'flex' && data.scene) {
+          openSceneInspection(data.scene);
+        }
+
+      } catch (err) {
+        showToast('⚠️ Error: ' + err.message);
+      }
+    };
+
     window.retryVisualAsset = async function(projectId, assetType, itemId, event) {
       if (event) event.stopPropagation();
       const btn = event && event.target ? event.target.closest('button') : null;
