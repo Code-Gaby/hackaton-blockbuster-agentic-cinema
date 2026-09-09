@@ -3,8 +3,6 @@
 *.env.local
 
 # SQLite Database (generated on first run)
-*.db
-*.sqlite3
 *.db-journal
 *.db-wal
 
