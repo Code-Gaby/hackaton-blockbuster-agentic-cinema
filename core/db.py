@@ -535,7 +535,14 @@ def seed_demo_projects(conn):
         ("INT. TORRE TRANSMISORA DE VALE MEDIA - AMANECER", "Elara conecta el proyector maestro a la antena matriz para emitir la verdad.", "Determinación victoriosa.", "Viento de gran altura y zumbido de transformadores.")
     ]
     for i, (slug, sum_text, sub_txt, env_txt) in enumerate(scenes_p2, 1):
-        cursor.execute("INSERT OR REPLACE INTO scenes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (
+        cursor.execute("""
+    INSERT OR REPLACE INTO scenes (
+        id, project_id, scene_number, title, slugline, location, interior_exterior,
+        day_night, summary, script_text, subtext, environmental_details,
+        characters_json, props_json, wardrobe_json, vfx_json, sfx_json,
+        complexity, risk_score, estimated_cost
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
             f"scene_p2_{i}", p2, i, f"Escena {i}: Celuloide", slug, "Estudio 1995", "INT" if "INT." in slug else "EXT", "NIGHT" if "NOCHE" in slug or "MADRUGADA" in slug else "DAY",
             sum_text, {
                 1: f"{slug}\n\nFADE IN:\n\n{sum_text}\n\nELARA\n(con el cuenta-hilos sobre el fotograma 412)\nSofía, mira el margen derecho de este negativo. La silueta que camina junto a la farola no figuraba en la copia de estreno comercial de 1995.\n\nSOFÍA\n(limpiando el cabezal de la moviola)\nDebe ser una mancha de vinagre por descomposición química, Elara. Esa bobina pasó treinta años en una caja fuerte oxidada.\n\nELARA\n(moviendo la manivela despacio)\nNo es vinagre. Respira, Sofía. El celuloide fue cortado y reensamblado para ocultar a un testigo.\n\nCUT TO:",
