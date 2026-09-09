@@ -2,14 +2,19 @@
 *.env.local
 .git
 .gitignore
-__pycache__
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.pytest_cache
+.pytest_cache/
 scratch/
 .gemini/
+
+# SQLite temporary/locking files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Database backups
 *backup*
 *.pre_*
-*.db
-*.sqlite3
