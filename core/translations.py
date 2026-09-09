@@ -12,7 +12,6 @@ TRANSLATIONS = {
         "format": "Formato",
         "target_budget": "Presupuesto Objetivo ($)",
         "gemini_online": "GEMINI Creativo: En Línea",
-        "ibm_online": "IBM watsonx: En Línea",
         "demo_mode": "Modo Demostración",
 
         # 7 Filmmaking Stages
@@ -74,7 +73,7 @@ TRANSLATIONS = {
 
         # Control room
         "control_title": "SALA DE CONTROL Y COLABORACIÓN DE AGENTES",
-        "run_agent_loop": "Ejecutar Bucle Gemini + IBM"
+        "run_agent_loop": "Ejecutar Bucle Gemini Studio"
     },
     "EN": {
         "studio_title": "STUDIO AI CINEMA & THEATRE",
@@ -89,7 +88,6 @@ TRANSLATIONS = {
         "format": "Format",
         "target_budget": "Target Budget ($)",
         "gemini_online": "GEMINI Creative: Online",
-        "ibm_online": "IBM watsonx: Online",
         "demo_mode": "Demo Mode",
 
         # 7 Filmmaking Stages
@@ -151,7 +149,7 @@ TRANSLATIONS = {
 
         # Control room
         "control_title": "AGENTIC CONTROL ROOM & COLLABORATION MATRIX",
-        "run_agent_loop": "Run Gemini + IBM Loop"
+        "run_agent_loop": "Run Gemini Studio Loop"
     },
     "FR": {
         "studio_title": "STUDIO AI CINÉMA & THÉÂTRE",
@@ -166,7 +164,6 @@ TRANSLATIONS = {
         "format": "Format",
         "target_budget": "Budget Cible ($)",
         "gemini_online": "GEMINI Créatif: En Ligne",
-        "ibm_online": "IBM watsonx: En Ligne",
         "demo_mode": "Mode Démo",
 
         "stage_01": "01 VISION",
@@ -222,7 +219,7 @@ TRANSLATIONS = {
         "visual_prompt": "Prompt Storyboard",
 
         "control_title": "SALLE DE CONTRÔLE DE COLLABORATION",
-        "run_agent_loop": "Lancer la boucle Gemini + IBM"
+        "run_agent_loop": "Lancer la boucle Gemini Studio"
     },
     "DE": {
         "studio_title": "STUDIO AI KINO & THEATER",
@@ -237,7 +234,6 @@ TRANSLATIONS = {
         "format": "Format",
         "target_budget": "Zielbudget ($)",
         "gemini_online": "GEMINI Kreativ: Online",
-        "ibm_online": "IBM watsonx: Online",
         "demo_mode": "Demo-Modus",
 
         "stage_01": "01 VISION",
@@ -293,7 +289,7 @@ TRANSLATIONS = {
         "visual_prompt": "Visual-Prompt",
 
         "control_title": "KI-STEUERRAUM & AGENTEN",
-        "run_agent_loop": "Gemini + IBM Schleife Ausführen"
+        "run_agent_loop": "Gemini Studio Schleife Ausführen"
     },
     "IT": {
         "studio_title": "STUDIO AI CINEMA & TEATRO",
@@ -308,7 +304,6 @@ TRANSLATIONS = {
         "format": "Formato",
         "target_budget": "Budget Obiettivo ($)",
         "gemini_online": "GEMINI Creativo: Online",
-        "ibm_online": "IBM watsonx: Online",
         "demo_mode": "Modalità Demo",
 
         "stage_01": "01 VISIONE",
@@ -364,7 +359,7 @@ TRANSLATIONS = {
         "visual_prompt": "Prompt Visuale",
 
         "control_title": "SALA DI CONTROLLO AGENTI",
-        "run_agent_loop": "Esegui Ciclo Gemini + IBM"
+        "run_agent_loop": "Esegui Ciclo Gemini Studio"
     },
     "PT": {
         "studio_title": "STUDIO AI CINEMA & TEATRO",
@@ -379,7 +374,6 @@ TRANSLATIONS = {
         "format": "Formato",
         "target_budget": "Orçamento Alvo ($)",
         "gemini_online": "GEMINI Criativo: Online",
-        "ibm_online": "IBM watsonx: Online",
         "demo_mode": "Modo Demo",
 
         "stage_01": "01 VISÃO",
@@ -435,7 +429,7 @@ TRANSLATIONS = {
         "visual_prompt": "Prompt Visual",
 
         "control_title": "SALA DE CONTROLE DE AGENTES",
-        "run_agent_loop": "Executar Ciclo Gemini + IBM"
+        "run_agent_loop": "Executar Ciclo Gemini Studio"
     }
 }
 

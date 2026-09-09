@@ -360,9 +360,9 @@ CUT TO:
         {"timestamp": "2026-08-10 14:20", "event": "Project Created", "agent": "User", "details": "Initialized project 'The Last Signal' (Sci-Fi Feature Film)."},
         {"timestamp": "2026-08-10 14:22", "event": "Creative Story Outline", "agent": "Gemini", "details": "Generated logline, synopsis, tone, and 7 core character profiles."},
         {"timestamp": "2026-08-10 14:25", "event": "Screenplay Generated", "agent": "Gemini", "details": "Created 34 scenes with complete dialog and sluglines."},
-        {"timestamp": "2026-08-10 14:28", "event": "Script Breakdown & Feasibility Audit", "agent": "IBM watsonx", "details": "Identified 6 high VFX scenes & estimated initial cost at $68,400 (Budget Overrun: +$18,400)."},
-        {"timestamp": "2026-08-10 14:32", "event": "Continuity Scan Complete", "agent": "IBM watsonx", "details": "Flagged 3 continuity alerts across wardrobe, props, and character injury timelines."},
-        {"timestamp": "2026-08-10 14:35", "event": "AI Budget Optimization Propose", "agent": "Gemini & IBM", "details": "Proposed 4 optimization options (Options A, B, C, D) to reduce production cost to $49,500."}
+        {"timestamp": "2026-08-10 14:28", "event": "Script Breakdown & Feasibility Audit", "agent": "Gemini Studio Agent", "details": "Identified 6 high VFX scenes & estimated initial cost at $68,400 (Budget Overrun: +$18,400)."},
+        {"timestamp": "2026-08-10 14:32", "event": "Continuity Scan Complete", "agent": "Gemini Studio Agent", "details": "Flagged 3 continuity alerts across wardrobe, props, and character injury timelines."},
+        {"timestamp": "2026-08-10 14:35", "event": "AI Budget Optimization Propose", "agent": "Gemini Studio Director", "details": "Proposed 4 optimization options (Options A, B, C, D) to reduce production cost to $49,500."}
     ]
 
     return Project(
